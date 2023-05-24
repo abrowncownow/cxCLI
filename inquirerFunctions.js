@@ -13,8 +13,7 @@ export async function getCustomerName() {
     if (matchingCustomers.length === 0) {
         console.log(`No customers found with name ${answers.name}`);
         // You might want to loop back to the start of the menu here
-        //TODO: FIX ISSUE WITH RETURN
-        return menu();
+        return getCustomerName();
     } else if (matchingCustomers.length === 1) {
         // If there's only one match, just return that one
         return matchingCustomers[0]._id;
