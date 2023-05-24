@@ -7,14 +7,6 @@ import * as inquirerFunctions from './inquirerFunctions.js';
 import * as dbOperations from './databaseOperations.js';
 
 
-// const inquirer = require('inquirer');
-// const mongoose = require('mongoose');
-// const Customer = require('./models/customer.js');
-// require('dotenv').config();
-// const inquirerFunctions = require('./inquirerFunctions');
-// const dbOperations = require('./databaseOperations');
-
-
 mongoose.connect(process.env.DB_URI, {useNewUrlParser: true, useUnifiedTopology: true});
 
 async function menu(){
@@ -31,9 +23,8 @@ async function menu(){
             menu();
             break;
         case 'Search Customer By Name':
-            const name = await inquirerFunctions.getCustomerByName();
-            console.log (name);
-            const customer = await dbOperations.findCustomersByName(name);
+            const id = await inquirerFunctions.getCustomerName();
+            const customer = await dbOperations.findCustomerById(id);
             console.log(customer);
             menu();
             break;
@@ -44,10 +35,54 @@ async function menu(){
             menu();
             break;
         case 'Update Customer':
-            // TODO: Ask for the customer's name/ID, then ask for the updated information and update the Customer document
+            const idToUpdate = await inquirerFunctions.getCustomerName();
+            const customerToUpdate = await dbOperations.findCustomerById(idToUpdate);
+            const updateChoice = await inquirerFunctions.updateCustomerMenu();
+            switch (updateChoice.choice) {
+                case 'Update Contact Info':
+                    const updatedContactInfo = await inquirerFunctions.getCustomerContact(customerToUpdate);
+                    // Call a dbOperations function to update the customer in the database
+                    await dbOperations.updateCustomerContact(idToUpdate, updatedContactInfo);
+                    menu();
+                    break;
+                case 'Add Backup Config':
+                    const newBackupConfig = await inquirerFunctions.getBackupConfig();
+                    // Call a dbOperations function to update the customer in the database
+                    console.log('New config saved');
+                    console.log(newBackupConfig);
+                    console.log('updating db...')
+                    await dbOperations.updateCustomerBackupConfig(idToUpdate, newBackupConfig);
+                    console.log('update completed');
+                    menu();
+                    break;
+
+                case 'Add Payment Details':
+                    const newPaymentDetails = await inquirerFunctions.getPaymentDetails();
+                    // Call a dbOperations function to update the customer in the database
+                    await dbOperations.updateCustomerPaymentDetails(idToUpdate, newPaymentDetails);
+                    menu();
+                    break;
+                case 'Add Contract':
+                    const newContract = await inquirerFunctions.getContract();
+                    // Call a dbOperations function to update the customer in the database
+                    await dbOperations.addCustomerContract(idToUpdate, newContract);
+                    menu();
+                    break;
+            }
             break;
         case 'Delete Customer':
-            // TODO: Ask for the customer's name/ID, then delete the Customer document
+            const idToDelete = await inquirerFunctions.getCustomerName();
+            const customerToDelete = await dbOperations.findCustomerById(idToDelete);
+            console.log("Do you want to delete this customer:");
+            console.log(customerToDelete);
+            const confirmDelete = await inquirerFunctions.deleteCustomerConfirm();
+            if (confirmDelete.name === customerToDelete.name){
+                await dbOperations.deleteCustomer(idToDelete);
+                console.log(`Customer '${customerToDelete.name}' deleted!!!`);
+            } else{
+                console.log('Name entered does not match customer name. Returning to menu');
+            }
+            menu();
             break;
         case 'Exit':
             process.exit();
