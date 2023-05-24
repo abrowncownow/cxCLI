@@ -9,8 +9,8 @@ export async function findCustomersByName(name) {
     return matchingCustomers;
 };
 
-export async function createCustomer(name, email) {
-    const customer = new Customer({ name: name, email: email });
+export async function createCustomer(newCustomerData) {
+    const customer = new Customer(newCustomerData);
     return customer.save();
 };
 

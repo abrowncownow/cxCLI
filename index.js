@@ -38,8 +38,8 @@ async function menu(){
             menu();
             break;
         case 'New Customer':
-            const newCustomerData = await inquirerFunctions.getNewCustomerData();
-            const newCustomer = await dbOperations.createCustomer(newCustomerData.name, newCustomerData.email);
+            const newCustomerData = await inquirerFunctions.getCustomerContact();
+            const newCustomer = await dbOperations.createCustomer(newCustomerData);
             console.log('Created new customer:', newCustomer);
             menu();
             break;
